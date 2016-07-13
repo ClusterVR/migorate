@@ -2,8 +2,8 @@ package main
 
 import ()
 import (
-	"github.com/urfave/cli"
 	"github.com/mizoguche/migorate/migration"
+	"github.com/urfave/cli"
 	"os"
 )
 
@@ -21,8 +21,7 @@ func main() {
 				if err != nil {
 					return err
 				}
-				migration.Generate(path, c.Args().First())
-				return nil
+				return migration.Generate(path, c.Args().First())
 			},
 		},
 	}
