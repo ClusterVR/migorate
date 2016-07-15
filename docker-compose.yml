@@ -1,0 +1,17 @@
+version: '2'
+services:
+  db:
+    image: mysql
+    environment:
+      MYSQL_USER: 'migorate'
+      MYSQL_PASSWORD: 'migorate'
+      MYSQL_DATABASE: 'migorate'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
+    volumes:
+      - ./testdb/mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+volumes:
+  db:
+    driver: local

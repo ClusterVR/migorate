@@ -31,3 +31,6 @@ vendor/
 
 ### For integration test
 db/migrations/
+
+### For Docker db volume
+testdb
