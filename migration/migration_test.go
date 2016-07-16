@@ -93,14 +93,8 @@ func assertCreateBooksMigration(t *testing.T, m Migration) {
 }
 
 func initDb() *sql.DB {
-	ioutil.WriteFile(".migoraterc", []byte(`
-mysql:
-  host: localhost
-  port: 3306
-  user: migorate
-  password: migorate
-  database: migorate
-`), os.ModePerm)
+	buf, _ := ioutil.ReadFile("../test/rc/mysql.yml")
+	ioutil.WriteFile(".migoraterc", buf, os.ModePerm)
 
 	db := mysql.Database()
 	db.Exec("DELETE FROM migorate_migrations")

@@ -37,14 +37,8 @@ func TestDatabase(t *testing.T) {
 }
 
 func createTestRc() {
-	ioutil.WriteFile(".migoraterc", []byte(`
-mysql:
-  host: localhost
-  port: 3306
-  user: migorate
-  password: migorate
-  database: migorate
-`), os.ModePerm)
+	buf, _ := ioutil.ReadFile("../../../test/rc/mysql.yml")
+	ioutil.WriteFile(".migoraterc", buf, os.ModePerm)
 }
 
 func removeTestRc() {
