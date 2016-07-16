@@ -24,7 +24,6 @@ type mySQLRunCommand struct {
 	Mysql RunCommand
 }
 
-// LoadRc from .migoraterc file
 func loadRc() *mySQLRunCommand {
 	buf, err := ioutil.ReadFile(".migoraterc")
 	if err != nil {
