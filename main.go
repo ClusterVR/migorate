@@ -1,11 +1,11 @@
 package main
 
-import ()
 import (
+	"fmt"
 	"github.com/mizoguche/migorate/migration"
 	"github.com/urfave/cli"
+	"log"
 	"os"
-	"fmt"
 )
 
 func main() {
@@ -33,9 +33,9 @@ func main() {
 				path := "db/migrations"
 				migrations := *migration.Plan(path, migration.Up)
 				count := len(migrations)
-				fmt.Println("Planned migrations:")
+				log.Println("Planned migrations:")
 				for i, m := range migrations {
-					fmt.Printf("  %0" + fmt.Sprintf("%d", count / 10 + 1) + "d: %+v\n", (i + 1), m.ID)
+					log.Printf("  %0"+fmt.Sprintf("%d", count/10+1)+"d: %+v\n", (i + 1), m.ID)
 				}
 				return nil
 			},
