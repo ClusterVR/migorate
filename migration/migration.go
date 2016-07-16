@@ -1,7 +1,9 @@
 package migration
 
 import (
+	"database/sql"
 	"io/ioutil"
+	"log"
 	"regexp"
 	"strings"
 )
@@ -39,4 +41,23 @@ func splitSQL(src string) []string {
 	}
 	sqls = sqls[:len(sqls)-1]
 	return sqls
+}
+
+func (m *Migration) Exec(db *sql.DB, d MigrationDirection) {
+	var sql []string
+	if d == Up {
+		sql = m.Up
+	} else {
+		sql = m.Down
+	}
+
+	log.Printf("Executing %v", m.ID)
+	for _, s := range sql {
+		_, err := db.Exec(s)
+		if err != nil {
+			log.Printf("Failed to execute SQL: %v\n%v\n", s, err)
+		} else {
+			log.Printf("  %v", s)
+		}
+	}
 }

@@ -12,6 +12,8 @@ import (
 	"testing"
 )
 
+const testMigrationPath = "../test/fixtures/1_two_migrations"
+
 func TestGenerate(t *testing.T) {
 	os.Mkdir("tmp", 0777)
 	name := "test_migration"
@@ -39,7 +41,7 @@ func TestPlan(t *testing.T) {
 	db := initDb()
 	defer cleanupDb(db)
 
-	migrations := *Plan("../test/fixtures/1_two_migrations", Up)
+	migrations := *Plan(testMigrationPath, Up)
 	assert.Equal(t, 2, len(migrations), "Expect 2 migration found but %v found.", len(migrations))
 
 	assertCreateUsersMigration(t, migrations[0])
@@ -52,7 +54,7 @@ func TestPlanWhenAlreadyMigratedLastFile(t *testing.T) {
 
 	db.Exec("INSERT INTO migorate_migrations(id, migrated_at) VALUES('20160714092604_create_books', NOW());")
 
-	migrations := *Plan("../test/fixtures/1_two_migrations", Up)
+	migrations := *Plan(testMigrationPath, Up)
 	assert.Equal(t, 1, len(migrations), "Expect 1 migration found but %v found.", len(migrations))
 	assertCreateUsersMigration(t, migrations[0])
 }
@@ -65,7 +67,7 @@ func TestPlanWhenAlreadyMigrated(t *testing.T) {
 	fmt.Print(res)
 	fmt.Print(err)
 
-	migrations := *Plan("../test/fixtures/1_two_migrations", Up)
+	migrations := *Plan(testMigrationPath, Up)
 	assert.Equal(t, 1, len(migrations), "Expect 1 migration found but %v found.", len(migrations))
 	assertCreateBooksMigration(t, migrations[0])
 }
@@ -93,6 +95,8 @@ func initDb() *sql.DB {
 
 	db := mysql.Database()
 	db.Exec("DELETE FROM migorate_migrations")
+	db.Exec("DROP TABLE users")
+	db.Exec("DROP TABLE books")
 	return db
 }
 
