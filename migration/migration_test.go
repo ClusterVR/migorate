@@ -6,6 +6,11 @@ import (
 	"os"
 	"regexp"
 	"testing"
+
+	"database/sql"
+	"fmt"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/mizoguche/migorate/migration/db/mysql"
 )
 
 func TestGenerate(t *testing.T) {
@@ -32,19 +37,77 @@ func TestGenerate(t *testing.T) {
 }
 
 func TestPlan(t *testing.T) {
+	db := initDb()
+	defer cleanupDb(db)
+
 	migrations := *Plan("../test/fixtures/1_two_migrations", Up)
 	assert.Equal(t, 2, len(migrations), "Expect 2 migration found but %v found.", len(migrations))
 
-	assert.Equal(t, "20160714092556_create_users", migrations[0].Id, "Migration id")
-	assert.Equal(t, 2, len(migrations[0].Up), "%+v", migrations[0].Up)
-	assert.Equal(t, 1, len(migrations[0].Down), "%+v", migrations[0].Down)
-	assert.Equal(t, "CREATE TABLE users(id PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255), email VARCHAR(255), created_at TIMESTAMP);", migrations[0].Up[0])
-	assert.Equal(t, "ALTER TABLE users ADD INDEX index_users_email(email);", migrations[0].Up[1])
-	assert.Equal(t, "DROP TABLE users;", migrations[0].Down[0])
+	assertCreateUsersMigration(t, migrations[0])
+	assertCreateBooksMigration(t, migrations[1])
+}
 
-	assert.Equal(t, "20160714092604_create_books", migrations[1].Id, "Migration id")
-	assert.Equal(t, 1, len(migrations[1].Up), "%+v", migrations[1].Up)
-	assert.Equal(t, 1, len(migrations[1].Down), "%+v", migrations[1].Down)
-	assert.Equal(t, "CREATE TABLE books(id PRIMARY KEY AUTO_INCREMENT, title VARCHAR(255), author VARCHAR(255), created_at TIMESTAMP);", migrations[1].Up[0])
-	assert.Equal(t, "DROP TABLE books;", migrations[1].Down[0])
+func TestPlanWhenAlreadyMigratedLastFile(t *testing.T) {
+	db := initDb()
+	defer cleanupDb(db)
+
+	db.Exec("INSERT INTO migorate_migrations(id, migrated_at) VALUES('20160714092604_create_books', NOW());")
+
+	migrations := *Plan("../test/fixtures/1_two_migrations", Up)
+	assert.Equal(t, 1, len(migrations), "Expect 1 migration found but %v found.", len(migrations))
+	assertCreateUsersMigration(t, migrations[0])
+
+	db.Close()
+}
+
+func TestPlanWhenAlreadyMigrated(t *testing.T) {
+	db := initDb()
+	defer cleanupDb(db)
+
+	res, err := db.Exec("INSERT INTO migorate_migrations(id, migrated_at) VALUES('20160714092556_create_users', NOW());")
+	fmt.Print(res)
+	fmt.Print(err)
+
+	migrations := *Plan("../test/fixtures/1_two_migrations", Up)
+	assert.Equal(t, 1, len(migrations), "Expect 1 migration found but %v found.", len(migrations))
+	assertCreateBooksMigration(t, migrations[0])
+
+	db.Close()
+}
+
+func assertCreateUsersMigration(t *testing.T, m Migration) {
+	assert.Equal(t, "20160714092556_create_users", m.Id, "Migration id")
+	assert.Equal(t, 2, len(m.Up), "%+v", m.Up)
+	assert.Equal(t, 1, len(m.Down), "%+v", m.Down)
+	assert.Equal(t, "CREATE TABLE users(id PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255), email VARCHAR(255), created_at TIMESTAMP);", m.Up[0])
+	assert.Equal(t, "ALTER TABLE users ADD INDEX index_users_email(email);", m.Up[1])
+	assert.Equal(t, "DROP TABLE users;", m.Down[0])
+}
+
+func assertCreateBooksMigration(t *testing.T, m Migration) {
+	assert.Equal(t, "20160714092604_create_books", m.Id, "Migration id")
+	assert.Equal(t, 1, len(m.Up), "%+v", m.Up)
+	assert.Equal(t, 1, len(m.Down), "%+v", m.Down)
+	assert.Equal(t, "CREATE TABLE books(id PRIMARY KEY AUTO_INCREMENT, title VARCHAR(255), author VARCHAR(255), created_at TIMESTAMP);", m.Up[0])
+	assert.Equal(t, "DROP TABLE books;", m.Down[0])
+}
+
+func initDb() *sql.DB {
+	ioutil.WriteFile(".migoraterc", []byte(`
+mysql:
+  host: localhost
+  port: 3306
+  user: migorate
+  password: migorate
+  database: migorate
+`), os.ModePerm)
+
+	db := mysql.Database()
+	db.Exec("DELETE FROM migorate_migrations")
+	return db
+}
+
+func cleanupDb(db *sql.DB) {
+	os.Remove(".migoraterc")
+	db.Exec("DELETE FROM migorate_migrations")
 }

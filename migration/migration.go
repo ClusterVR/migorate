@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"database/sql"
 )
 
 type Migration struct {
@@ -44,16 +45,38 @@ func Generate(dir string, name string) error {
 }
 
 func Plan(dir string, direction MigrationDirection) *[]Migration {
+	db, err := sql.Open("mysql",  "migorate:migorate@tcp(localhost:3306)/migorate")
+	if err != nil {
+		log.Fatalf("Failed to open database: %v", err)
+	}
+	defer db.Close()
+
 	files, _ := ioutil.ReadDir(dir)
 	r := regexp.MustCompile(`(\d\d\d\d\d\d\d\d\d\d\d\d\d\d_.+)\.sql`)
 	sqls := make([]Migration, 0, len(files))
 	for _, f := range files {
 		if r.MatchString(f.Name()) {
 			g := r.FindSubmatch([]byte(f.Name()))
-			sqls = append(sqls, NewMigration(dir, string(g[1])))
+			id := string(g[1])
+			rows, err := db.Query("SELECT COUNT(*) FROM migorate_migrations WHERE id = ?", id)
+			if err != nil {
+				log.Fatalf("Failed to query: %v", err)
+			}
+			count := count(rows)
+			if count == 0 {
+				sqls = append(sqls, NewMigration(dir, id))
+			}
 		}
 	}
+
 	return &sqls
+}
+
+func count(r *sql.Rows) (count int) {
+	for r.Next() {
+		r.Scan(&count)
+	}
+	return count
 }
 
 func NewMigration(dir string, id string) Migration {
