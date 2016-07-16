@@ -1,30 +1,32 @@
 package migration
 
 import (
+	"database/sql"
 	"fmt"
+	"github.com/mizoguche/migorate/migration/db/mysql"
 	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
 	"strings"
 	"time"
-	"database/sql"
-	"github.com/mizoguche/migorate/migration/db/mysql"
 )
 
+// Migration information
 type Migration struct {
-	Id   string
+	ID   string
 	Up   []string
 	Down []string
 }
 
-type MigrationDirection int
+type migrationDirection int
 
 const (
-	Up MigrationDirection = iota
-	Down
+	up migrationDirection = iota
+	down
 )
 
+// Generate migration sql file
 func Generate(dir string, name string) error {
 	t := time.Now()
 	id := fmt.Sprintf("%d%02d%02d%02d%02d%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
@@ -45,7 +47,8 @@ func Generate(dir string, name string) error {
 	return nil
 }
 
-func Plan(dir string, direction MigrationDirection) *[]Migration {
+// Plan migration according to migrated information in database
+func Plan(dir string, direction migrationDirection) *[]Migration {
 	db := mysql.Database()
 	defer db.Close()
 
@@ -77,16 +80,17 @@ func count(r *sql.Rows) (count int) {
 	return count
 }
 
+// NewMigration constructor
 func NewMigration(dir string, id string) Migration {
 	b, _ := ioutil.ReadFile(dir + "/" + id + ".sql")
 	r := regexp.MustCompile(`(?m)-- \+migrate Up\n([\s\S]*)\n-- \+migrate Down\n([\s\S]*)`)
 	sqls := r.FindSubmatch(b)
-	up := splitSql(string(sqls[1]))
-	down := splitSql(string(sqls[2]))
-	return Migration{Id: id, Up: up, Down: down}
+	up := splitSQL(string(sqls[1]))
+	down := splitSQL(string(sqls[2]))
+	return Migration{ID: id, Up: up, Down: down}
 }
 
-func splitSql(src string) []string {
+func splitSQL(src string) []string {
 	raw := strings.Split(src, ";")
 	sqls := make([]string, 0, len(raw))
 	for _, s := range strings.Split(src, ";\n") {

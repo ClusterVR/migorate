@@ -7,9 +7,10 @@ import (
 	"io/ioutil"
 	"log"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql" // Use mysql driver
 )
 
+// RunCommand is configuration for database connection
 type RunCommand struct {
 	Host     string
 	Port     string
@@ -18,16 +19,18 @@ type RunCommand struct {
 	Database string
 }
 
-type MysqlRunCommand struct {
+// MysqlRunCommand is configuration for MySQL connection
+type mySQLRunCommand struct {
 	Mysql RunCommand
 }
 
-func LoadRc() *MysqlRunCommand {
+// LoadRc from .migoraterc file
+func loadRc() *mySQLRunCommand {
 	buf, err := ioutil.ReadFile(".migoraterc")
 	if err != nil {
 		log.Fatalf("Failed to load .migoraterc: %v\n", err)
 	}
-	m := MysqlRunCommand{}
+	m := mySQLRunCommand{}
 	err = yaml.Unmarshal(buf, &m)
 	if err != nil {
 		log.Fatalf("Failed to load .migoraterc as YAML: %v\n", err)
@@ -35,8 +38,9 @@ func LoadRc() *MysqlRunCommand {
 	return &m
 }
 
+// Database which is connected to MySQL
 func Database() *sql.DB {
-	rc := LoadRc()
+	rc := loadRc()
 	uri := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v", rc.Mysql.User, rc.Mysql.Password, rc.Mysql.Host, rc.Mysql.Port, rc.Mysql.Database)
 	db, err := sql.Open("mysql", uri)
 	if err != nil {

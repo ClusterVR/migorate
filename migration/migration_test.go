@@ -40,7 +40,7 @@ func TestPlan(t *testing.T) {
 	db := initDb()
 	defer cleanupDb(db)
 
-	migrations := *Plan("../test/fixtures/1_two_migrations", Up)
+	migrations := *Plan("../test/fixtures/1_two_migrations", up)
 	assert.Equal(t, 2, len(migrations), "Expect 2 migration found but %v found.", len(migrations))
 
 	assertCreateUsersMigration(t, migrations[0])
@@ -53,7 +53,7 @@ func TestPlanWhenAlreadyMigratedLastFile(t *testing.T) {
 
 	db.Exec("INSERT INTO migorate_migrations(id, migrated_at) VALUES('20160714092604_create_books', NOW());")
 
-	migrations := *Plan("../test/fixtures/1_two_migrations", Up)
+	migrations := *Plan("../test/fixtures/1_two_migrations", up)
 	assert.Equal(t, 1, len(migrations), "Expect 1 migration found but %v found.", len(migrations))
 	assertCreateUsersMigration(t, migrations[0])
 }
@@ -66,13 +66,13 @@ func TestPlanWhenAlreadyMigrated(t *testing.T) {
 	fmt.Print(res)
 	fmt.Print(err)
 
-	migrations := *Plan("../test/fixtures/1_two_migrations", Up)
+	migrations := *Plan("../test/fixtures/1_two_migrations", up)
 	assert.Equal(t, 1, len(migrations), "Expect 1 migration found but %v found.", len(migrations))
 	assertCreateBooksMigration(t, migrations[0])
 }
 
 func assertCreateUsersMigration(t *testing.T, m Migration) {
-	assert.Equal(t, "20160714092556_create_users", m.Id, "Migration id")
+	assert.Equal(t, "20160714092556_create_users", m.ID, "Migration id")
 	assert.Equal(t, 2, len(m.Up), "%+v", m.Up)
 	assert.Equal(t, 1, len(m.Down), "%+v", m.Down)
 	assert.Equal(t, "CREATE TABLE users(id PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255), email VARCHAR(255), created_at TIMESTAMP);", m.Up[0])
@@ -81,7 +81,7 @@ func assertCreateUsersMigration(t *testing.T, m Migration) {
 }
 
 func assertCreateBooksMigration(t *testing.T, m Migration) {
-	assert.Equal(t, "20160714092604_create_books", m.Id, "Migration id")
+	assert.Equal(t, "20160714092604_create_books", m.ID, "Migration id")
 	assert.Equal(t, 1, len(m.Up), "%+v", m.Up)
 	assert.Equal(t, 1, len(m.Down), "%+v", m.Down)
 	assert.Equal(t, "CREATE TABLE books(id PRIMARY KEY AUTO_INCREMENT, title VARCHAR(255), author VARCHAR(255), created_at TIMESTAMP);", m.Up[0])

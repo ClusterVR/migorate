@@ -11,7 +11,7 @@ func TestLoadRc(t *testing.T) {
 	createTestRc()
 	defer removeTestRc()
 
-	rc := LoadRc()
+	rc := loadRc()
 
 	assert.True(t, len(rc.Mysql.Host) > 0)
 	assert.Equal(t, "3306", rc.Mysql.Port)
