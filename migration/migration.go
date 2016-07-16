@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 	"database/sql"
+	"github.com/mizoguche/migorate/migration/db/mysql"
 )
 
 type Migration struct {
@@ -45,10 +46,7 @@ func Generate(dir string, name string) error {
 }
 
 func Plan(dir string, direction MigrationDirection) *[]Migration {
-	db, err := sql.Open("mysql",  "migorate:migorate@tcp(localhost:3306)/migorate")
-	if err != nil {
-		log.Fatalf("Failed to open database: %v\n", err)
-	}
+	db := mysql.Database()
 	defer db.Close()
 
 	files, _ := ioutil.ReadDir(dir)
