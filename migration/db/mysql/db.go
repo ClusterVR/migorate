@@ -25,12 +25,12 @@ type MysqlRunCommand struct {
 func LoadRc() *MysqlRunCommand {
 	buf, err := ioutil.ReadFile(".migoraterc")
 	if err != nil {
-		log.Fatalf("Failed to load .migoraterc: %v", err)
+		log.Fatalf("Failed to load .migoraterc: %v\n", err)
 	}
 	m := MysqlRunCommand{}
 	err = yaml.Unmarshal(buf, &m)
 	if err != nil {
-		log.Fatalf("Failed to load .migoraterc as YAML: %v", err)
+		log.Fatalf("Failed to load .migoraterc as YAML: %v\n", err)
 	}
 	return &m
 }
@@ -38,15 +38,14 @@ func LoadRc() *MysqlRunCommand {
 func Database() *sql.DB {
 	rc := LoadRc()
 	uri := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v", rc.Mysql.User, rc.Mysql.Password, rc.Mysql.Host, rc.Mysql.Port, rc.Mysql.Database)
-	fmt.Printf("connect to %v", uri)
 	db, err := sql.Open("mysql", uri)
 	if err != nil {
-		log.Fatalf("Failed to open database: %v", err)
+		log.Fatalf("Failed to open database: %v\n", err)
 	}
 
 	_, err = db.Exec("CREATE TABLE IF NOT EXISTS migorate_migrations(id VARCHAR(255) PRIMARY KEY, migrated_at TIMESTAMP);")
 	if err != nil {
-		log.Fatalf("Failed to create migration management table: %v", err)
+		log.Fatalf("Failed to create migration management table: %v\n", err)
 	}
 	return db
 }

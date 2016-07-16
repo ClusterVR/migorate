@@ -36,7 +36,7 @@ func Generate(dir string, name string) error {
 `)
 	err := ioutil.WriteFile(filepath, content, os.ModePerm)
 	if err != nil {
-		log.Printf("Failed to generate file\n%v", err)
+		log.Printf("Failed to generate file\n%v\n", err)
 		return err
 	}
 
@@ -47,7 +47,7 @@ func Generate(dir string, name string) error {
 func Plan(dir string, direction MigrationDirection) *[]Migration {
 	db, err := sql.Open("mysql",  "migorate:migorate@tcp(localhost:3306)/migorate")
 	if err != nil {
-		log.Fatalf("Failed to open database: %v", err)
+		log.Fatalf("Failed to open database: %v\n", err)
 	}
 	defer db.Close()
 
