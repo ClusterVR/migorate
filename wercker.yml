@@ -10,7 +10,7 @@ build:
   steps:
     - glide-install
     - setup-go-workspace
-    # - golint
+    - golint
     - script:
       name: set mysql host to env
       code: ./wercker_env.sh
