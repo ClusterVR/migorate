@@ -16,4 +16,4 @@ build:
       code: ./wercker_env.sh
     - script:
       name: go test
-      code: go test $(go list ./... | grep -v /vendor/)
+      code: go test -v -cover $(go list ./... | grep -v /vendor/)
