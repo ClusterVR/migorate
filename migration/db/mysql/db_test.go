@@ -13,15 +13,11 @@ func TestLoadRc(t *testing.T) {
 
 	rc := LoadRc()
 
-	assert.Equal(t, &MysqlRunCommand{
-		Mysql: RunCommand{
-			Host:     "localhost",
-			Port:     "3306",
-			User:     "migorate",
-			Password: "migorate",
-			Database: "migorate",
-		},
-	}, rc)
+	assert.True(t, len(rc.Mysql.Host) > 0)
+	assert.Equal(t, "3306", rc.Mysql.Port)
+	assert.Equal(t, "migorate", rc.Mysql.User)
+	assert.Equal(t, "migorate", rc.Mysql.Password)
+	assert.Equal(t, "migorate", rc.Mysql.Database)
 }
 
 func TestDatabase(t *testing.T) {

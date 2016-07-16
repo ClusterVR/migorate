@@ -38,6 +38,7 @@ func LoadRc() *MysqlRunCommand {
 func Database() *sql.DB {
 	rc := LoadRc()
 	uri := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v", rc.Mysql.User, rc.Mysql.Password, rc.Mysql.Host, rc.Mysql.Port, rc.Mysql.Database)
+	fmt.Printf("connect to %v", uri)
 	db, err := sql.Open("mysql", uri)
 	if err != nil {
 		log.Fatalf("Failed to open database: %v", err)

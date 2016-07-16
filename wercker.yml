@@ -1,9 +1,8 @@
 box: golang:latest
 services:
-  - id: mariadb
+  - id: mysql
     env:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_HOST: localhost
       MYSQL_USER: migorate
       MYSQL_PASSWORD: migorate
       MYSQL_DATABASE: migorate
@@ -12,6 +11,9 @@ build:
     - glide-install
     - setup-go-workspace
     # - golint
+    - script:
+      name: set mysql host to env
+      code: ./wercker_env.sh
     - script:
       name: go test
       code: go test $(go list ./... | grep -v /vendor/)
