@@ -1,10 +1,14 @@
-hash: 5ce55cc732fe8254692639ac1011d50e3e8557eea8f9bc26c60569f08f20457a
-updated: 2016-07-16T01:07:45.251772315+09:00
+hash: 5590adac9401ca1355bb3d4381b33cdc58abc46445ed310f424bfa986c837da4
+updated: 2016-07-16T16:52:36.435137619+09:00
 imports:
 - name: github.com/go-sql-driver/mysql
   version: 3654d25ec346ee8ce71a68431025458d52a38ac0
+- name: github.com/stretchr/testify
+  version: d77da356e56a7428ad25149ca77381849a6a5232
+  subpackages:
+  - assert
 - name: github.com/urfave/cli
-  version: 0b2c86782838cbd66a4048f1b55535bf67387fcc
+  version: ec402ecec579718ec2d7a686db201bbeb6ad918a
 - name: gopkg.in/check.v1
   version: 4f90aeace3a26ad7021961c297b22c42160c7b25
 - name: gopkg.in/yaml.v2
