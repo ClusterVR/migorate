@@ -19,11 +19,11 @@ type Migration struct {
 	Down []string
 }
 
-type migrationDirection int
+type MigrationDirection int
 
 const (
-	up migrationDirection = iota
-	down
+	Up MigrationDirection = iota
+	Down
 )
 
 // Generate migration sql file
@@ -48,7 +48,7 @@ func Generate(dir string, name string) error {
 }
 
 // Plan migration according to migrated information in database
-func Plan(dir string, direction migrationDirection) *[]Migration {
+func Plan(dir string, direction MigrationDirection) *[]Migration {
 	db := mysql.Database()
 	defer db.Close()
 

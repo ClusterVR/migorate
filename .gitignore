@@ -31,6 +31,7 @@ vendor/
 
 ### For integration test
 db/migrations/
+.migoraterc
 
 ### For Docker db volume
 testdb
