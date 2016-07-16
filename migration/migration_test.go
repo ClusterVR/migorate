@@ -56,8 +56,6 @@ func TestPlanWhenAlreadyMigratedLastFile(t *testing.T) {
 	migrations := *Plan("../test/fixtures/1_two_migrations", Up)
 	assert.Equal(t, 1, len(migrations), "Expect 1 migration found but %v found.", len(migrations))
 	assertCreateUsersMigration(t, migrations[0])
-
-	db.Close()
 }
 
 func TestPlanWhenAlreadyMigrated(t *testing.T) {
@@ -71,8 +69,6 @@ func TestPlanWhenAlreadyMigrated(t *testing.T) {
 	migrations := *Plan("../test/fixtures/1_two_migrations", Up)
 	assert.Equal(t, 1, len(migrations), "Expect 1 migration found but %v found.", len(migrations))
 	assertCreateBooksMigration(t, migrations[0])
-
-	db.Close()
 }
 
 func assertCreateUsersMigration(t *testing.T, m Migration) {
@@ -104,4 +100,5 @@ func initDb() *sql.DB {
 func cleanupDb(db *sql.DB) {
 	os.Remove(".migoraterc")
 	db.Exec("DELETE FROM migorate_migrations")
+	db.Close()
 }

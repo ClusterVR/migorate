@@ -30,6 +30,7 @@ func TestDatabase(t *testing.T) {
 	// Table migorate_migrations should exist
 	_, err := db.Exec("SELECT * FROM migorate_migrations;")
 	assert.Nil(t, err)
+	db.Close()
 }
 
 func createTestRc() {
