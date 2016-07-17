@@ -58,6 +58,10 @@ func Plan(dir string, direction Direction, dest string) *[]Migration {
 			if count(rows) == availableCount {
 				sqls = append(sqls, NewMigration(dir, id))
 			}
+
+			if id == dest {
+				return &sqls
+			}
 		}
 	}
 

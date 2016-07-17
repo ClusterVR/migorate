@@ -88,6 +88,21 @@ func TestPlanRollback(t *testing.T) {
 	assertCreateUsersMigration(t, migrations[2])
 }
 
+func TestPlanRollbackToBooks(t *testing.T) {
+	db := initDb()
+	defer cleanupDb(db)
+
+	db.Exec("INSERT INTO migorate_migrations(id, migrated_at) VALUES('20160714092556_create_users', NOW());")
+	db.Exec("INSERT INTO migorate_migrations(id, migrated_at) VALUES('20160714092604_create_books', NOW());")
+	db.Exec("INSERT INTO migorate_migrations(id, migrated_at) VALUES('20160716102604_create_authors', NOW());")
+
+	migrations := *Plan(testMigrationPath, Down, "20160714092604_create_books")
+	assert.Equal(t, 2, len(migrations), "Expect 2 migration found but %v found.", len(migrations))
+
+	assertCreateAuthorsMigration(t, migrations[0])
+	assertCreateBooksMigration(t, migrations[1])
+}
+
 func assertCreateUsersMigration(t *testing.T, m Migration) {
 	assert.Equal(t, "20160714092556_create_users", m.ID, "Migration id")
 	assert.Equal(t, 2, len(m.Up), "%+v", m.Up)
