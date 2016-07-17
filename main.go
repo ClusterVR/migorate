@@ -65,6 +65,25 @@ func main() {
 				return nil
 			},
 		},
+		{
+			Name:    "rollback",
+			Usage:   "rollback migration",
+			Action: func(c *cli.Context) error {
+				path := "db/migrations"
+				migrations := *migration.Plan(path, migration.Down, dest(c))
+				if len(migrations) == 0 {
+					log.Printf("No migration executed.")
+					return nil
+				}
+
+				db := mysql.Database()
+				defer db.Close()
+				for _, m := range migrations {
+					m.Exec(db, migration.Down)
+				}
+				return nil
+			},
+		},
 	}
 
 	app.Run(os.Args)

@@ -68,7 +68,12 @@ func (m *Migration) Exec(db *sql.DB, d Direction) {
 		log.Printf("  %v", s)
 	}
 
-	migSQL := "INSERT INTO migorate_migrations(id, migrated_at) VALUES(?, NOW())"
+	var migSQL string
+	if d == Up{
+		migSQL = "INSERT INTO migorate_migrations(id, migrated_at) VALUES(?, NOW())"
+	}else{
+		migSQL = "DELETE FROM migorate_migrations WHERE id = ?"
+	}
 	_, err = db.Exec(migSQL, m.ID)
 	failIfError(migSQL, err, tx)
 
