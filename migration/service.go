@@ -48,21 +48,30 @@ func Plan(dir string, direction Direction, dest string) *[]Migration {
 			if err != nil {
 				log.Fatalf("Failed to query: %v", err)
 			}
-			add(direction, rows, dir, id, &sqls)
+			sqls = *add(direction, rows, dir, id, &sqls)
 		}
 	}
 
 	return &sqls
 }
 
-func add(d Direction, rows *sql.Rows, dir string, id string, sqls *[]Migration){
+func add(d Direction, rows *sql.Rows, dir string, id string, sqls *[]Migration) *[]Migration{
 	count := count(rows)
 	if d == Up {
 		if count == 0 {
-			*sqls = append(*sqls, NewMigration(dir, id))
+			s := append(*sqls, NewMigration(dir, id))
+			return &s
 		}
-		return
+		return sqls
 	}
+
+	if count == 1 {
+		s := append(*sqls, Migration{})
+		copy(s[1:], s[0:])
+		s[0] = NewMigration(dir, id)
+		return &s
+	}
+	return sqls
 }
 
 func count(r *sql.Rows) (count int) {
