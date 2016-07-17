@@ -52,12 +52,27 @@ func (m *Migration) Exec(db *sql.DB, d MigrationDirection) {
 	}
 
 	log.Printf("Executing %v", m.ID)
+	tx, err := db.Begin()
+	if err != nil {
+		log.Fatalf("Failed to start transaction: %v\n", err)
+	}
+
 	for _, s := range sql {
-		_, err := db.Exec(s)
-		if err != nil {
-			log.Fatalf("Failed to execute SQL: %v\n%v\n", s, err)
-		} else {
-			log.Printf("  %v", s)
-		}
+		_, err = db.Exec(s)
+		failIfError(s, err, tx)
+		log.Printf("  %v", s)
+	}
+
+	migSQL := "INSERT INTO migorate_migrations(id, migrated_at) VALUES(?, NOW())"
+	_, err = db.Exec(migSQL, m.ID)
+	failIfError(migSQL, err, tx)
+
+	tx.Commit()
+}
+
+func failIfError(s string, err error, tx *sql.Tx)  {
+	if err != nil {
+		tx.Rollback()
+		log.Fatalf("Failed to execute SQL: %v\n%v\nRollback transaction.", s, err)
 	}
 }
