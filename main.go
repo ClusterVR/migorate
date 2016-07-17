@@ -30,9 +30,19 @@ func main() {
 			Name:    "plan",
 			Aliases: []string{"p"},
 			Usage:   "plan migration",
+			Flags: []cli.Flag {
+				cli.BoolFlag{
+					Name: "rollback, r",
+					Usage: "Show rollback migration",
+				},
+			},
 			Action: func(c *cli.Context) error {
+				d := migration.Up
+				if c.Bool("rollback") {
+					d = migration.Down
+				}
 				path := "db/migrations"
-				migrations := *migration.Plan(path, migration.Up, dest(c))
+				migrations := *migration.Plan(path, d, dest(c))
 				count := len(migrations)
 				if count == 0 {
 					log.Printf("No migration planned.")
