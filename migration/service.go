@@ -33,29 +33,47 @@ func Generate(dir string, name string) error {
 }
 
 // Plan migration according to migrated information in database
-func Plan(dir string, direction Direction) *[]Migration {
+func Plan(dir string, direction Direction, dest string) *[]Migration {
 	db := mysql.Database()
 	defer db.Close()
 
 	files, _ := ioutil.ReadDir(dir)
 	r := regexp.MustCompile(`(\d\d\d\d\d\d\d\d\d\d\d\d\d\d_.+)\.sql`)
 	sqls := make([]Migration, 0, len(files))
-	for _, f := range files {
-		if r.MatchString(f.Name()) {
-			g := r.FindSubmatch([]byte(f.Name()))
+	for i := range files {
+		filename := currentFilename(files, direction, i)
+
+		if r.MatchString(filename) {
+			g := r.FindSubmatch([]byte(filename))
 			id := string(g[1])
 			rows, err := db.Query("SELECT COUNT(*) FROM migorate_migrations WHERE id = ?", id)
 			if err != nil {
 				log.Fatalf("Failed to query: %v", err)
 			}
-			count := count(rows)
-			if count == 0 {
+
+			var availableCount int
+			if direction == Down {
+				availableCount = 1
+			}
+			if count(rows) == availableCount {
 				sqls = append(sqls, NewMigration(dir, id))
+			}
+
+			if id == dest {
+				return &sqls
 			}
 		}
 	}
 
 	return &sqls
+}
+
+func currentFilename(files []os.FileInfo, d Direction, i int) string {
+	if d == Up {
+		return files[i].Name()
+	}
+
+	return files[len(files)-1-i].Name()
 }
 
 func count(r *sql.Rows) (count int) {

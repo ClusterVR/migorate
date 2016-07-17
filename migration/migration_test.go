@@ -9,7 +9,7 @@ func TestExec(t *testing.T) {
 	db := initDb()
 	defer cleanupDb(db)
 
-	migrations := Plan(testMigrationPath, Up)
+	migrations := Plan(testMigrationPath, Up, "")
 	for _, m := range *migrations {
 		m.Exec(db, Up)
 	}

@@ -68,14 +68,19 @@ func (m *Migration) Exec(db *sql.DB, d Direction) {
 		log.Printf("  %v", s)
 	}
 
-	migSQL := "INSERT INTO migorate_migrations(id, migrated_at) VALUES(?, NOW())"
+	var migSQL string
+	if d == Up {
+		migSQL = "INSERT INTO migorate_migrations(id, migrated_at) VALUES(?, NOW())"
+	} else {
+		migSQL = "DELETE FROM migorate_migrations WHERE id = ?"
+	}
 	_, err = db.Exec(migSQL, m.ID)
 	failIfError(migSQL, err, tx)
 
 	tx.Commit()
 }
 
-func failIfError(s string, err error, tx *sql.Tx)  {
+func failIfError(s string, err error, tx *sql.Tx) {
 	if err != nil {
 		tx.Rollback()
 		log.Fatalf("Failed to execute SQL: %v\n%v\nRollback transaction.", s, err)
