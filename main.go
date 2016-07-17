@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"github.com/mizoguche/migorate/migration"
 	"github.com/urfave/cli"
-	"log"
 	"os"
+	"log"
+	"github.com/mizoguche/migorate/migration/db/mysql"
 )
 
 func main() {
@@ -36,6 +37,21 @@ func main() {
 				log.Println("Planned migrations:")
 				for i, m := range migrations {
 					log.Printf("  %0"+fmt.Sprintf("%d", count/10+1)+"d: %+v\n", (i + 1), m.ID)
+				}
+				return nil
+			},
+		},
+		{
+			Name:    "exec",
+			Aliases: []string{"e"},
+			Usage:   "execute migration",
+			Action: func(c *cli.Context) error {
+				path := "db/migrations"
+				migrations := *migration.Plan(path, migration.Up)
+				db := mysql.Database()
+				defer db.Close()
+				for _, m := range migrations {
+					m.Exec(db, migration.Up)
 				}
 				return nil
 			},
