@@ -23,7 +23,7 @@ func main() {
 				if err != nil {
 					return err
 				}
-				return migration.Generate(path, c.Args().First())
+				return migration.Generate(path, c.Args().First(), c.Args()[1:c.NArg()])
 			},
 		},
 		{
