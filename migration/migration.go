@@ -15,10 +15,14 @@ type Migration struct {
 	Down []string
 }
 
-type MigrationDirection int
+// Direction (Up or Down)
+type Direction int
 
 const (
-	Up MigrationDirection = iota
+	// Up used on migration to forward
+	Up Direction = iota
+
+	// Down used on rollback
 	Down
 )
 
@@ -43,7 +47,8 @@ func splitSQL(src string) []string {
 	return sqls
 }
 
-func (m *Migration) Exec(db *sql.DB, d MigrationDirection) {
+// Exec migration
+func (m *Migration) Exec(db *sql.DB, d Direction) {
 	var sql []string
 	if d == Up {
 		sql = m.Up
