@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/mizoguche/migorate/migration"
-	"github.com/urfave/cli"
-	"os"
-	"log"
 	"github.com/mizoguche/migorate/migration/db/mysql"
+	"github.com/urfave/cli"
+	"log"
+	"os"
 )
 
 func main() {
@@ -47,13 +47,13 @@ func main() {
 			},
 		},
 		{
-			Name:    "exec",
-			Usage:   "execute migration",
+			Name:   "exec",
+			Usage:  "execute migration",
 			Action: func(c *cli.Context) error { return migrate(migration.Up, dest(c)) },
 		},
 		{
-			Name:    "rollback",
-			Usage:   "rollback migration",
+			Name:   "rollback",
+			Usage:  "rollback migration",
 			Action: func(c *cli.Context) error { return migrate(migration.Down, dest(c)) },
 		},
 	}

@@ -158,7 +158,7 @@ func cleanupDb(db *sql.DB) {
 	db.Close()
 }
 
-func cleanUpTables(db *sql.DB){
+func cleanUpTables(db *sql.DB) {
 	db.Exec("DELETE FROM migorate_migrations")
 	db.Exec("DROP TABLE users")
 	db.Exec("DROP TABLE books")
