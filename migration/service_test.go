@@ -76,7 +76,7 @@ func assertCreateUsersMigration(t *testing.T, m Migration) {
 	assert.Equal(t, "20160714092556_create_users", m.ID, "Migration id")
 	assert.Equal(t, 2, len(m.Up), "%+v", m.Up)
 	assert.Equal(t, 1, len(m.Down), "%+v", m.Down)
-	assert.Equal(t, "CREATE TABLE users(id PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255), email VARCHAR(255), created_at TIMESTAMP);", m.Up[0])
+	assert.Equal(t, "CREATE TABLE users(id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255), email VARCHAR(255), created_at TIMESTAMP);", m.Up[0])
 	assert.Equal(t, "ALTER TABLE users ADD INDEX index_users_email(email);", m.Up[1])
 	assert.Equal(t, "DROP TABLE users;", m.Down[0])
 }
@@ -85,7 +85,7 @@ func assertCreateBooksMigration(t *testing.T, m Migration) {
 	assert.Equal(t, "20160714092604_create_books", m.ID, "Migration id")
 	assert.Equal(t, 1, len(m.Up), "%+v", m.Up)
 	assert.Equal(t, 1, len(m.Down), "%+v", m.Down)
-	assert.Equal(t, "CREATE TABLE books(id PRIMARY KEY AUTO_INCREMENT, title VARCHAR(255), author VARCHAR(255), created_at TIMESTAMP);", m.Up[0])
+	assert.Equal(t, "CREATE TABLE books(id INT PRIMARY KEY AUTO_INCREMENT, title VARCHAR(255), author VARCHAR(255), created_at TIMESTAMP);", m.Up[0])
 	assert.Equal(t, "DROP TABLE books;", m.Down[0])
 }
 
@@ -103,5 +103,7 @@ func initDb() *sql.DB {
 func cleanupDb(db *sql.DB) {
 	os.Remove(".migoraterc")
 	db.Exec("DELETE FROM migorate_migrations")
+	db.Exec("DROP TABLE users")
+	db.Exec("DROP TABLE books")
 	db.Close()
 }
