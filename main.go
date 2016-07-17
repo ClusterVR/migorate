@@ -49,40 +49,12 @@ func main() {
 		{
 			Name:    "exec",
 			Usage:   "execute migration",
-			Action: func(c *cli.Context) error {
-				path := "db/migrations"
-				migrations := *migration.Plan(path, migration.Up, dest(c))
-				if len(migrations) == 0 {
-					log.Printf("No migration executed.")
-					return nil
-				}
-
-				db := mysql.Database()
-				defer db.Close()
-				for _, m := range migrations {
-					m.Exec(db, migration.Up)
-				}
-				return nil
-			},
+			Action: func(c *cli.Context) error { return migrate(migration.Up, dest(c)) },
 		},
 		{
 			Name:    "rollback",
 			Usage:   "rollback migration",
-			Action: func(c *cli.Context) error {
-				path := "db/migrations"
-				migrations := *migration.Plan(path, migration.Down, dest(c))
-				if len(migrations) == 0 {
-					log.Printf("No migration executed.")
-					return nil
-				}
-
-				db := mysql.Database()
-				defer db.Close()
-				for _, m := range migrations {
-					m.Exec(db, migration.Down)
-				}
-				return nil
-			},
+			Action: func(c *cli.Context) error { return migrate(migration.Down, dest(c)) },
 		},
 	}
 
@@ -94,4 +66,20 @@ func dest(c *cli.Context) string {
 		return c.Args()[0]
 	}
 	return ""
+}
+
+func migrate(d migration.Direction, dest string) error {
+	path := "db/migrations"
+	migrations := *migration.Plan(path, d, dest)
+	if len(migrations) == 0 {
+		log.Printf("No migration executed.")
+		return nil
+	}
+
+	db := mysql.Database()
+	defer db.Close()
+	for _, m := range migrations {
+		m.Exec(db, d)
+	}
+	return nil
 }
