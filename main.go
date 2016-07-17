@@ -32,7 +32,7 @@ func main() {
 			Usage:   "plan migration",
 			Action: func(c *cli.Context) error {
 				path := "db/migrations"
-				migrations := *migration.Plan(path, migration.Up, "")
+				migrations := *migration.Plan(path, migration.Up, dest(c))
 				count := len(migrations)
 				if count == 0 {
 					log.Printf("No migration planned.")
@@ -48,11 +48,10 @@ func main() {
 		},
 		{
 			Name:    "exec",
-			Aliases: []string{"e"},
 			Usage:   "execute migration",
 			Action: func(c *cli.Context) error {
 				path := "db/migrations"
-				migrations := *migration.Plan(path, migration.Up, "")
+				migrations := *migration.Plan(path, migration.Up, dest(c))
 				if len(migrations) == 0 {
 					log.Printf("No migration executed.")
 					return nil
@@ -69,4 +68,11 @@ func main() {
 	}
 
 	app.Run(os.Args)
+}
+
+func dest(c *cli.Context) string {
+	if c.NArg() > 0 {
+		return c.Args()[0]
+	}
+	return ""
 }
