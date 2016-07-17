@@ -1,8 +1,8 @@
 package migration
 
 import (
-	"regexp"
 	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -34,7 +34,7 @@ DROP TABLE %v;
 		convertedCols += col[0] + " " + t + ", "
 	}
 	if len(convertedCols) > 0 {
-		convertedCols = convertedCols[0:len(convertedCols) - 2]
+		convertedCols = convertedCols[0 : len(convertedCols)-2]
 	}
 	return fmt.Sprintf(template, table, convertedCols, table)
 }

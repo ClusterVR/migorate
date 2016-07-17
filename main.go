@@ -30,13 +30,13 @@ func main() {
 			Name:    "plan",
 			Aliases: []string{"p"},
 			Usage:   "plan migration",
-			Flags: []cli.Flag {
+			Flags: []cli.Flag{
 				cli.BoolFlag{
-					Name: "rollback, r",
+					Name:  "rollback, r",
 					Usage: "Show rollback migration",
 				},
 				cli.BoolFlag{
-					Name: "verbose, v",
+					Name:  "verbose, v",
 					Usage: "Show each SQL in migration",
 				},
 			},
