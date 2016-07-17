@@ -73,7 +73,6 @@ func currentFilename(files []os.FileInfo, d Direction, i int) string {
 		return files[i].Name()
 	}
 
-	log.Println(files[len(files)-1-i].Name())
 	return files[len(files)-1-i].Name()
 }
 
