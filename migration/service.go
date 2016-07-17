@@ -12,16 +12,11 @@ import (
 )
 
 // Generate migration sql file
-func Generate(dir string, name string) error {
+func Generate(dir string, name string, cols []string) error {
 	t := time.Now()
 	id := fmt.Sprintf("%d%02d%02d%02d%02d%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
 	filepath := fmt.Sprintf("%s/%s_%s.sql", dir, id, name)
-	content := []byte(`-- +migrate Up
-
-
--- +migrate Down
-
-`)
+	content := []byte(generateSQL(name, cols))
 	err := ioutil.WriteFile(filepath, content, os.ModePerm)
 	if err != nil {
 		log.Printf("Failed to generate file\n%v\n", err)

@@ -17,7 +17,7 @@ func TestGenerate(t *testing.T) {
 	os.Mkdir("tmp", 0777)
 	name := "test_migration"
 
-	Generate("tmp", name)
+	Generate("tmp", name, []string{})
 
 	files, _ := ioutil.ReadDir("tmp")
 	assert.Equal(t, 1, len(files), "Expected 1 file generated.")

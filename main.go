@@ -23,20 +23,20 @@ func main() {
 				if err != nil {
 					return err
 				}
-				return migration.Generate(path, c.Args().First())
+				return migration.Generate(path, c.Args().First(), c.Args()[1:c.NArg()])
 			},
 		},
 		{
 			Name:    "plan",
 			Aliases: []string{"p"},
 			Usage:   "plan migration",
-			Flags: []cli.Flag {
+			Flags: []cli.Flag{
 				cli.BoolFlag{
-					Name: "rollback, r",
+					Name:  "rollback, r",
 					Usage: "Show rollback migration",
 				},
 				cli.BoolFlag{
-					Name: "verbose, v",
+					Name:  "verbose, v",
 					Usage: "Show each SQL in migration",
 				},
 			},
