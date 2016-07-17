@@ -2,14 +2,10 @@ package migration
 
 import (
 	"database/sql"
-	"fmt"
-	"github.com/mizoguche/migorate/migration/db/mysql"
 	"io/ioutil"
 	"log"
-	"os"
 	"regexp"
 	"strings"
-	"time"
 )
 
 // Migration information
@@ -19,66 +15,16 @@ type Migration struct {
 	Down []string
 }
 
-type MigrationDirection int
+// Direction (Up or Down)
+type Direction int
 
 const (
-	Up MigrationDirection = iota
+	// Up used on migration to forward
+	Up Direction = iota
+
+	// Down used on rollback
 	Down
 )
-
-// Generate migration sql file
-func Generate(dir string, name string) error {
-	t := time.Now()
-	id := fmt.Sprintf("%d%02d%02d%02d%02d%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
-	filepath := fmt.Sprintf("%s/%s_%s.sql", dir, id, name)
-	content := []byte(`-- +migrate Up
-
-
--- +migrate Down
-
-`)
-	err := ioutil.WriteFile(filepath, content, os.ModePerm)
-	if err != nil {
-		log.Printf("Failed to generate file\n%v\n", err)
-		return err
-	}
-
-	log.Printf("Generated: %v", filepath)
-	return nil
-}
-
-// Plan migration according to migrated information in database
-func Plan(dir string, direction MigrationDirection) *[]Migration {
-	db := mysql.Database()
-	defer db.Close()
-
-	files, _ := ioutil.ReadDir(dir)
-	r := regexp.MustCompile(`(\d\d\d\d\d\d\d\d\d\d\d\d\d\d_.+)\.sql`)
-	sqls := make([]Migration, 0, len(files))
-	for _, f := range files {
-		if r.MatchString(f.Name()) {
-			g := r.FindSubmatch([]byte(f.Name()))
-			id := string(g[1])
-			rows, err := db.Query("SELECT COUNT(*) FROM migorate_migrations WHERE id = ?", id)
-			if err != nil {
-				log.Fatalf("Failed to query: %v", err)
-			}
-			count := count(rows)
-			if count == 0 {
-				sqls = append(sqls, NewMigration(dir, id))
-			}
-		}
-	}
-
-	return &sqls
-}
-
-func count(r *sql.Rows) (count int) {
-	for r.Next() {
-		r.Scan(&count)
-	}
-	return count
-}
 
 // NewMigration constructor
 func NewMigration(dir string, id string) Migration {
@@ -99,4 +45,39 @@ func splitSQL(src string) []string {
 	}
 	sqls = sqls[:len(sqls)-1]
 	return sqls
+}
+
+// Exec migration
+func (m *Migration) Exec(db *sql.DB, d Direction) {
+	var sql []string
+	if d == Up {
+		sql = m.Up
+	} else {
+		sql = m.Down
+	}
+
+	log.Printf("Executing %v", m.ID)
+	tx, err := db.Begin()
+	if err != nil {
+		log.Fatalf("Failed to start transaction: %v\n", err)
+	}
+
+	for _, s := range sql {
+		_, err = db.Exec(s)
+		failIfError(s, err, tx)
+		log.Printf("  %v", s)
+	}
+
+	migSQL := "INSERT INTO migorate_migrations(id, migrated_at) VALUES(?, NOW())"
+	_, err = db.Exec(migSQL, m.ID)
+	failIfError(migSQL, err, tx)
+
+	tx.Commit()
+}
+
+func failIfError(s string, err error, tx *sql.Tx)  {
+	if err != nil {
+		tx.Rollback()
+		log.Fatalf("Failed to execute SQL: %v\n%v\nRollback transaction.", s, err)
+	}
 }
