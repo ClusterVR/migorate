@@ -55,7 +55,7 @@ func (m *Migration) Exec(db *sql.DB, d MigrationDirection) {
 	for _, s := range sql {
 		_, err := db.Exec(s)
 		if err != nil {
-			log.Printf("Failed to execute SQL: %v\n%v\n", s, err)
+			log.Fatalf("Failed to execute SQL: %v\n%v\n", s, err)
 		} else {
 			log.Printf("  %v", s)
 		}
