@@ -35,6 +35,10 @@ func main() {
 					Name: "rollback, r",
 					Usage: "Show rollback migration",
 				},
+				cli.BoolFlag{
+					Name: "verbose, v",
+					Usage: "Show each SQL in migration",
+				},
 			},
 			Action: func(c *cli.Context) error {
 				d := migration.Up
@@ -52,6 +56,16 @@ func main() {
 				log.Println("Planned migrations:")
 				for i, m := range migrations {
 					log.Printf("  %0"+fmt.Sprintf("%d", count/10+1)+"d: %+v\n", (i + 1), m.ID)
+					if c.Bool("verbose") && d == migration.Up {
+						for _, s := range m.Up {
+							log.Printf("        %+v\n", s)
+						}
+					}
+					if c.Bool("verbose") && d == migration.Down {
+						for _, s := range m.Down {
+							log.Printf("        %+v\n", s)
+						}
+					}
 				}
 				return nil
 			},
