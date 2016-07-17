@@ -48,6 +48,17 @@ func TestPlan(t *testing.T) {
 	assertCreateAuthorsMigration(t, migrations[2])
 }
 
+func TestPlanToBooks(t *testing.T) {
+	db := initDb()
+	defer cleanupDb(db)
+
+	migrations := *Plan(testMigrationPath, Up, "20160714092604_create_books")
+	assert.Equal(t, 2, len(migrations), "Expect 2 migration found but %v found.", len(migrations))
+
+	assertCreateUsersMigration(t, migrations[0])
+	assertCreateBooksMigration(t, migrations[1])
+}
+
 func TestPlanWhenAlreadyMigratedBooks(t *testing.T) {
 	db := initDb()
 	defer cleanupDb(db)
