@@ -40,38 +40,37 @@ func Plan(dir string, direction Direction, dest string) *[]Migration {
 	files, _ := ioutil.ReadDir(dir)
 	r := regexp.MustCompile(`(\d\d\d\d\d\d\d\d\d\d\d\d\d\d_.+)\.sql`)
 	sqls := make([]Migration, 0, len(files))
-	for _, f := range files {
-		if r.MatchString(f.Name()) {
-			g := r.FindSubmatch([]byte(f.Name()))
+	for i := range files {
+		filename := currentFilename(files, direction, i)
+
+		if r.MatchString(filename) {
+			g := r.FindSubmatch([]byte(filename))
 			id := string(g[1])
 			rows, err := db.Query("SELECT COUNT(*) FROM migorate_migrations WHERE id = ?", id)
 			if err != nil {
 				log.Fatalf("Failed to query: %v", err)
 			}
-			sqls = *add(direction, rows, dir, id, &sqls)
+
+			var availableCount int
+			if direction == Down {
+				availableCount = 1
+			}
+			if count(rows) == availableCount {
+				sqls = append(sqls, NewMigration(dir, id))
+			}
 		}
 	}
 
 	return &sqls
 }
 
-func add(d Direction, rows *sql.Rows, dir string, id string, sqls *[]Migration) *[]Migration{
-	count := count(rows)
+func currentFilename(files []os.FileInfo, d Direction, i int) string {
 	if d == Up {
-		if count == 0 {
-			s := append(*sqls, NewMigration(dir, id))
-			return &s
-		}
-		return sqls
+		return files[i].Name()
 	}
 
-	if count == 1 {
-		s := append(*sqls, Migration{})
-		copy(s[1:], s[0:])
-		s[0] = NewMigration(dir, id)
-		return &s
-	}
-	return sqls
+	log.Println(files[len(files) - 1 - i].Name())
+	return files[len(files) - 1 - i].Name()
 }
 
 func count(r *sql.Rows) (count int) {
