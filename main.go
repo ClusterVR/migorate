@@ -32,7 +32,7 @@ func main() {
 			Usage:   "plan migration",
 			Action: func(c *cli.Context) error {
 				path := "db/migrations"
-				migrations := *migration.Plan(path, migration.Up)
+				migrations := *migration.Plan(path, migration.Up, "")
 				count := len(migrations)
 				if count == 0 {
 					log.Printf("No migration planned.")
@@ -52,7 +52,7 @@ func main() {
 			Usage:   "execute migration",
 			Action: func(c *cli.Context) error {
 				path := "db/migrations"
-				migrations := *migration.Plan(path, migration.Up)
+				migrations := *migration.Plan(path, migration.Up, "")
 				if len(migrations) == 0 {
 					log.Printf("No migration executed.")
 					return nil

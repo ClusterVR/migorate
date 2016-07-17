@@ -33,7 +33,7 @@ func Generate(dir string, name string) error {
 }
 
 // Plan migration according to migrated information in database
-func Plan(dir string, direction Direction) *[]Migration {
+func Plan(dir string, direction Direction, dest string) *[]Migration {
 	db := mysql.Database()
 	defer db.Close()
 
