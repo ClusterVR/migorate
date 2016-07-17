@@ -8,6 +8,7 @@ Simple database migration tool for Go.
 ## Features
 - Migration management
 - Execute SQL command from \*.sql files
+- Generate SQL file with Rails-like commands
 
 ## Usage
 ### Create .migoraterc
@@ -22,37 +23,55 @@ mysql:
 
 ### Generate migration file
 ```shell
-$ migorate generate create_users
-2016/07/17 21:13:45 Generated: db/migrations/20160717211345_create_users.sql
+$ migorate generate [migration id] [col:type]...
 ```
 
-```sql:db/migrations/20160717211345_create_users.sql
+```shell
+$ migorate generate create_users id:id name:string login_count:integer last_login_at:datetime created_at:timestamp
+2016/07/17 22:55:30 Generated: db/migrations/20160717225530_create_users.sql
+
+$ cat db/migrations/20160717225530_create_users.sql
 -- +migrate Up
--- Edit your migration SQL
-CREATE TABLE users(id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255));
+CREATE TABLE users(id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255), login_count INT, last_login_at DATETIME, created_at TIMESTAMP);
 
 -- +migrate Down
--- Edit your migration SQL for rollback
 DROP TABLE users;
 ```
+
+Currently, only `CREATE TABLE` migration can be generated with migration id `create_(tablename)`.
+
+All other migration id generates empty migration file.
+
+#### Type conversion
+| in command | SQL |
+|:---:|:---:|
+| id | INT PRIMARY KEY AUTO_INCREMENT |
+| integer | INT |
+| datetime | DATETIME |
+| string | VARCHAR(255) |
+| timestamp | TIMESTAMP |
 
 ### Plan migration
 ```shell
 $ migorate plan
 2016/07/17 21:16:53 Planned migrations:
-2016/07/17 21:16:53   1: 20160717211345_create_users
+2016/07/17 21:16:53   1: 20160717225530_create_users
 ```
 
 ### Execute migration
 ```shell
 $ migorate exec
-2016/07/17 21:17:49 Executing 20160717211345_create_users
-2016/07/17 21:17:49   CREATE TABLE users(id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255));
+2016/07/17 21:17:49 Executing 20160717225530_create_users
+2016/07/17 21:17:49   CREATE TABLE users(id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255), login_count INT, last_login_at DATETIME, created_at TIMESTAMP);
 ```
 
 ### Rollback
 ```shell
-$ migorate rollback 20160717211345_create_users
-2016/07/17 21:21:09 Executing 20160717211345_create_users
+$ migorate rollback [migration id]
+```
+
+```shell
+$ migorate rollback 20160717225530_create_users
+2016/07/17 21:21:09 Executing 20160717225530_create_users
 2016/07/17 21:21:09   DROP TABLE users;
 ```
