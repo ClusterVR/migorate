@@ -28,29 +28,37 @@ CREATE TABLE %v(%v);
 DROP TABLE %v;
 `
 	var convertedCols string
+	var fk string
 	for _, c := range cols {
 		col := strings.Split(c, ":")
-		t := convertType(col[1])
-		convertedCols += col[0] + " " + t + ", "
+		colname, t, f := convertType(col[0], col[1])
+		fk += f
+		convertedCols += colname + " " + t + ", "
 	}
-	if len(convertedCols) > 0 {
+	if len(fk) > 0 {
+		convertedCols += fk
+		convertedCols = convertedCols[0 : len(convertedCols)-2]
+	} else if len(convertedCols) > 0 {
 		convertedCols = convertedCols[0 : len(convertedCols)-2]
 	}
 	return fmt.Sprintf(template, table, convertedCols, table)
 }
 
-func convertType(t string) string {
+func convertType(c string, t string) (col string, typ string, fk string) {
 	switch t {
 	case "id":
-		return "INT PRIMARY KEY AUTO_INCREMENT"
+		return c, "INT PRIMARY KEY AUTO_INCREMENT", ""
 	case "integer":
-		return "INT"
+		return c, "INT", ""
 	case "datetime":
-		return "DATETIME"
+		return c, "DATETIME", ""
 	case "string":
-		return "VARCHAR(255)"
+		return c, "VARCHAR(255)", ""
 	case "timestamp":
-		return "TIMESTAMP"
+		return c, "TIMESTAMP", ""
+	case "references":
+		col = c + "_id"
+		return col, "INT", "FOREIGN KEY (" + col + ") REFERENCES " + c + "s(id), "
 	}
-	return t
+	return c, t, ""
 }

@@ -43,13 +43,14 @@ Currently, only `CREATE TABLE` migration can be generated with migration id `cre
 All other migration id generates empty migration file.
 
 #### Type conversion
-| in command | SQL |
-|:---:|:---:|
-| id | INT PRIMARY KEY AUTO_INCREMENT |
-| integer | INT |
-| datetime | DATETIME |
-| string | VARCHAR(255) |
-| timestamp | TIMESTAMP |
+| in command | SQL |  |
+|---|---|---|
+| id | INT PRIMARY KEY AUTO_INCREMENT |  |
+| integer | INT |  |
+| datetime | DATETIME |  |
+| string | VARCHAR(255) |  |
+| timestamp | TIMESTAMP |  |
+| references | INT | Adds foreign key to `id` in `(column_name)s` table |
 
 ### Plan migration
 ```shell
