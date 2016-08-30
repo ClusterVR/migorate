@@ -2,15 +2,24 @@ package main
 
 import (
 	"fmt"
-	"github.com/mizoguche/migorate/migration"
-	"github.com/mizoguche/migorate/migration/db/mysql"
-	"github.com/urfave/cli"
 	"log"
 	"os"
+
+	"github.com/urfave/cli"
+
+	"github.com/mizoguche/migorate/migration"
+	"github.com/mizoguche/migorate/migration/db/mysql"
 )
 
 func main() {
 	app := cli.NewApp()
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "path, p",
+			Usage: "migrations files directory path",
+			Value: "db/migrations",
+		},
+	}
 
 	app.Commands = []cli.Command{
 		{
@@ -18,7 +27,7 @@ func main() {
 			Aliases: []string{"g"},
 			Usage:   "generate migration file",
 			Action: func(c *cli.Context) error {
-				path := "db/migrations"
+				path := c.GlobalString("path")
 				err := os.MkdirAll(path, os.ModePerm)
 				if err != nil {
 					return err
@@ -45,11 +54,11 @@ func main() {
 				if c.Bool("rollback") {
 					d = migration.Down
 				}
-				path := "db/migrations"
+				path := c.GlobalString("path")
 				migrations := *migration.Plan(path, d, dest(c))
 				count := len(migrations)
 				if count == 0 {
-					log.Printf("No migration planned.")
+					log.Println("No migration planned.")
 					return nil
 				}
 
@@ -71,14 +80,20 @@ func main() {
 			},
 		},
 		{
-			Name:   "exec",
-			Usage:  "execute migration",
-			Action: func(c *cli.Context) error { return migrate(migration.Up, dest(c)) },
+			Name:  "exec",
+			Usage: "execute migration",
+			Action: func(c *cli.Context) error {
+				path := c.GlobalString("path")
+				return migrate(path, migration.Up, dest(c))
+			},
 		},
 		{
-			Name:   "rollback",
-			Usage:  "rollback migration",
-			Action: func(c *cli.Context) error { return migrate(migration.Down, dest(c)) },
+			Name:  "rollback",
+			Usage: "rollback migration",
+			Action: func(c *cli.Context) error {
+				path := c.GlobalString("path")
+				return migrate(path, migration.Down, dest(c))
+			},
 		},
 	}
 
@@ -92,11 +107,10 @@ func dest(c *cli.Context) string {
 	return ""
 }
 
-func migrate(d migration.Direction, dest string) error {
-	path := "db/migrations"
+func migrate(path string, d migration.Direction, dest string) error {
 	migrations := *migration.Plan(path, d, dest)
 	if len(migrations) == 0 {
-		log.Printf("No migration executed.")
+		log.Println("No migration executed.")
 		return nil
 	}
 
