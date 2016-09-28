@@ -6,6 +6,7 @@ import (
 	"log"
 	"regexp"
 	"strings"
+	"fmt"
 )
 
 // Migration information
@@ -40,8 +41,7 @@ func splitSQL(src string) []string {
 	raw := strings.Split(src, ";")
 	sqls := make([]string, 0, len(raw))
 	for _, s := range strings.Split(src, ";\n") {
-		sql := strings.Replace(s, "\n", "", -1) + ";"
-		sqls = append(sqls, sql)
+		sqls = append(sqls, s + ";")
 	}
 	sqls = sqls[:len(sqls)-1]
 	return sqls
@@ -65,7 +65,8 @@ func (m *Migration) Exec(db *sql.DB, d Direction) {
 	for _, s := range sql {
 		_, err = db.Exec(s)
 		failIfError(s, err, tx)
-		log.Printf("  %v", s)
+		log.Println("Executed:")
+		fmt.Printf("%s\n\n", s)
 	}
 
 	var migSQL string
