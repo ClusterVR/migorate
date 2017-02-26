@@ -42,7 +42,7 @@ func TestPlan(t *testing.T) {
 	db := initDb()
 	defer cleanupDb(db)
 
-	migrations := *Plan(testMigrationPath, Up, "")
+	migrations := *Plan(testMigrationPath, Up, "all")
 	assert.Equal(t, 3, len(migrations), "Expect 2 migration found but %v found.", len(migrations))
 
 	assertCreateUsersMigration(t, migrations[0])
@@ -67,7 +67,7 @@ func TestPlanWhenAlreadyMigratedBooks(t *testing.T) {
 
 	db.Exec("INSERT INTO migorate_migrations(id, migrated_at) VALUES('20160714092604_create_books', NOW());")
 
-	migrations := *Plan(testMigrationPath, Up, "")
+	migrations := *Plan(testMigrationPath, Up, "all")
 	assert.Equal(t, 2, len(migrations), "Expect 1 migration found but %v found.", len(migrations))
 	assertCreateUsersMigration(t, migrations[0])
 	assertCreateAuthorsMigration(t, migrations[1])
@@ -79,7 +79,7 @@ func TestPlanWhenAlreadyMigrated(t *testing.T) {
 
 	db.Exec("INSERT INTO migorate_migrations(id, migrated_at) VALUES('20160714092556_create_users', NOW());")
 
-	migrations := *Plan(testMigrationPath, Up, "")
+	migrations := *Plan(testMigrationPath, Up, "all")
 	assert.Equal(t, 2, len(migrations), "Expect 1 migration found but %v found.", len(migrations))
 	assertCreateBooksMigration(t, migrations[0])
 	assertCreateAuthorsMigration(t, migrations[1])
@@ -93,7 +93,7 @@ func TestPlanRollback(t *testing.T) {
 	db.Exec("INSERT INTO migorate_migrations(id, migrated_at) VALUES('20160714092604_create_books', NOW());")
 	db.Exec("INSERT INTO migorate_migrations(id, migrated_at) VALUES('20160716102604_create_authors', NOW());")
 
-	migrations := *Plan(testMigrationPath, Down, "")
+	migrations := *Plan(testMigrationPath, Down, "all")
 	assert.Equal(t, 3, len(migrations), "Expect 2 migration found but %v found.", len(migrations))
 
 	assertCreateAuthorsMigration(t, migrations[0])
