@@ -57,7 +57,12 @@ func main() {
 					d = migration.Down
 				}
 				path := c.GlobalString("path")
-				migrations := *migration.Plan(path, d, dest(c))
+				execFile := dest(c)
+				if len(execFile) == 0 {
+					log.Println("Please specify the file_name or 'all' to execute. ")
+					return nil
+				}
+				migrations := *migration.Plan(path, d, execFile)
 				count := len(migrations)
 				if count == 0 {
 					log.Println("No migration planned.")
@@ -86,7 +91,12 @@ func main() {
 			Usage: "execute migration",
 			Action: func(c *cli.Context) error {
 				path := c.GlobalString("path")
-				return migrate(path, migration.Up, dest(c))
+				execFile := dest(c)
+				if len(execFile) == 0 {
+					log.Println("Please specify the file_name or 'all' to execute. ")
+					return nil
+				}
+				return migrate(path, migration.Up, execFile)
 			},
 		},
 		{
@@ -94,7 +104,12 @@ func main() {
 			Usage: "rollback migration",
 			Action: func(c *cli.Context) error {
 				path := c.GlobalString("path")
-				return migrate(path, migration.Down, dest(c))
+				execFile := dest(c)
+				if len(execFile) == 0 {
+					log.Println("Please specify the file_name or 'all' to execute. ")
+					return nil
+				}
+				return migrate(path, migration.Down, execFile)
 			},
 		},
 	}

@@ -54,14 +54,14 @@ All other migration id generates empty migration file.
 
 ### Plan migration
 ```shell
-$ migorate plan
+$ migorate plan all
 2016/07/17 21:16:53 Planned migrations:
 2016/07/17 21:16:53   1: 20160717225530_create_users
 ```
 
 ### Execute migration
 ```shell
-$ migorate exec
+$ migorate exec all
 2016/07/17 21:17:49 Executing 20160717225530_create_users
 2016/07/17 21:17:49   CREATE TABLE users(id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255), login_count INT, last_login_at DATETIME, created_at TIMESTAMP);
 ```
@@ -75,4 +75,28 @@ $ migorate rollback [migration id]
 $ migorate rollback 20160717225530_create_users
 2016/07/17 21:21:09 Executing 20160717225530_create_users
 2016/07/17 21:21:09   DROP TABLE users;
+```
+
+### Rollback all
+```shell
+$ migorate rollback all
+2017/02/26 15:42:30 Executing 20160716102604_create_authors
+2017/02/26 15:42:30 Executed:
+ALTER TABLE books
+  DROP FOREIGN KEY fk_books_author_id;
+
+2017/02/26 15:42:30 Executed:
+DROP TABLE authors;
+
+2017/02/26 15:42:30 Executed:
+ALTER TABLE books
+  ADD (author VARCHAR(255));
+
+2017/02/26 15:42:30 Executing 20160714092604_create_books
+2017/02/26 15:42:30 Executed:
+DROP TABLE books;
+
+2017/02/26 15:42:30 Executing 20160714092556_create_users
+2017/02/26 15:42:30 Executed:
+DROP TABLE users;
 ```
