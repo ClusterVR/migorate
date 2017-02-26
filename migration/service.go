@@ -61,7 +61,10 @@ func Plan(dir string, direction Direction, dest string) *[]Migration {
 		}
 	}
 
-	return &sqls
+	if dest == "all" {
+		return &sqls
+	}
+	return &[]Migration{}
 }
 
 func currentFilename(files []os.FileInfo, d Direction, i int) string {
