@@ -3,12 +3,13 @@ package migration
 import (
 	"database/sql"
 	"fmt"
-	"github.com/mizoguche/migorate/migration/db/mysql"
 	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
 	"time"
+
+	"github.com/mizoguche/migorate/migration/db/mysql"
 )
 
 // Generate migration sql file

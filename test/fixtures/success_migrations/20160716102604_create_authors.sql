@@ -2,8 +2,7 @@
 CREATE TABLE authors (
   id         INT PRIMARY KEY AUTO_INCREMENT,
   name       VARCHAR(255),
-  created_at TIMESTAMP
-);
+  created_at TIMESTAMP);
 
 ALTER TABLE books
   DROP COLUMN author;
