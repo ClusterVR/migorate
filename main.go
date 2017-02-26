@@ -7,6 +7,8 @@ import (
 
 	"github.com/urfave/cli"
 
+	_ "github.com/go-sql-driver/mysql" // Use mysql driver
+
 	"github.com/mizoguche/migorate/migration"
 	"github.com/mizoguche/migorate/migration/db/mysql"
 )

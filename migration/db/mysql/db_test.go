@@ -1,10 +1,13 @@
 package mysql
 
 import (
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	_ "github.com/go-sql-driver/mysql" // Use mysql driver
 )
 
 func TestLoadRc(t *testing.T) {

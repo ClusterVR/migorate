@@ -2,11 +2,11 @@ package migration
 
 import (
 	"database/sql"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"regexp"
 	"strings"
-	"fmt"
 )
 
 // Migration information
@@ -41,7 +41,7 @@ func splitSQL(src string) []string {
 	raw := strings.Split(src, ";")
 	sqls := make([]string, 0, len(raw))
 	for _, s := range strings.Split(src, ";\n") {
-		sqls = append(sqls, s + ";")
+		sqls = append(sqls, s+";")
 	}
 	sqls = sqls[:len(sqls)-1]
 	return sqls

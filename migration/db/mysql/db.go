@@ -3,11 +3,10 @@ package mysql
 import (
 	"database/sql"
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 
-	_ "github.com/go-sql-driver/mysql" // Use mysql driver
+	"gopkg.in/yaml.v2"
 )
 
 // RunCommand is configuration for database connection
