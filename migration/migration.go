@@ -38,12 +38,18 @@ func NewMigration(dir string, id string) Migration {
 }
 
 func splitSQL(src string) []string {
-	raw := strings.Split(src, ";")
-	sqls := make([]string, 0, len(raw))
+	sqls := []string{}
 	for _, s := range strings.Split(src, ";\n") {
+		// replace sql comment
+		if strings.HasPrefix(s, "\n--") {
+			exp := regexp.MustCompile(`\n--.*\n`)
+			s = exp.ReplaceAllString(s, "")
+		}
+		if len(s) == 0 || s == "\n" {
+			continue
+		}
 		sqls = append(sqls, s+";")
 	}
-	sqls = sqls[:len(sqls)-1]
 	return sqls
 }
 
