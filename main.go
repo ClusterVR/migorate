@@ -21,6 +21,11 @@ func main() {
 			Usage: "migrations files directory path",
 			Value: "db/migrations",
 		},
+		cli.StringFlag{
+			Name:  "rc",
+			Usage: "migrations configuration file directory path",
+			Value: mysql.RCFilePath,
+		},
 	}
 
 	app.Commands = []cli.Command{
@@ -57,6 +62,7 @@ func main() {
 					d = migration.Down
 				}
 				path := c.GlobalString("path")
+				mysql.RCFilePath = c.GlobalString("rc")
 				execFile := dest(c)
 				if len(execFile) == 0 {
 					log.Println("Please specify the file_name or 'all' to execute. ")
@@ -91,6 +97,7 @@ func main() {
 			Usage: "execute migration",
 			Action: func(c *cli.Context) error {
 				path := c.GlobalString("path")
+				mysql.RCFilePath = c.GlobalString("rc")
 				execFile := dest(c)
 				if len(execFile) == 0 {
 					log.Println("Please specify the file_name or 'all' to execute. ")
@@ -104,6 +111,7 @@ func main() {
 			Usage: "rollback migration",
 			Action: func(c *cli.Context) error {
 				path := c.GlobalString("path")
+				mysql.RCFilePath = c.GlobalString("rc")
 				execFile := dest(c)
 				if len(execFile) == 0 {
 					log.Println("Please specify the file_name or 'all' to execute. ")

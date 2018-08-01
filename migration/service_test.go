@@ -154,7 +154,7 @@ func assertEqualStripQuery(t *testing.T, expected, received string) {
 
 func initDb() *sql.DB {
 	buf, _ := ioutil.ReadFile("../test/rc/mysql.yml")
-	ioutil.WriteFile(".migoraterc", buf, os.ModePerm)
+	ioutil.WriteFile(mysql.RCFilePath, buf, os.ModePerm)
 
 	db := mysql.Database()
 	cleanUpTables(db)
@@ -162,7 +162,7 @@ func initDb() *sql.DB {
 }
 
 func cleanupDb(db *sql.DB) {
-	os.Remove(".migoraterc")
+	os.Remove(mysql.RCFilePath)
 	cleanUpTables(db)
 	db.Close()
 }

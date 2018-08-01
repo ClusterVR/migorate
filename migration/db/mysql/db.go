@@ -9,6 +9,9 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// RCFilePath configuration file path
+var RCFilePath = ".migoraterc"
+
 // RunCommand is configuration for database connection
 type RunCommand struct {
 	Host     string
@@ -24,14 +27,14 @@ type mySQLRunCommand struct {
 }
 
 func loadRc() *mySQLRunCommand {
-	buf, err := ioutil.ReadFile(".migoraterc")
+	buf, err := ioutil.ReadFile(RCFilePath)
 	if err != nil {
-		log.Fatalf("Failed to load .migoraterc: %v\n", err)
+		log.Fatalf("Failed to load %s: %v\n", RCFilePath, err)
 	}
 	m := mySQLRunCommand{}
 	err = yaml.Unmarshal(buf, &m)
 	if err != nil {
-		log.Fatalf("Failed to load .migoraterc as YAML: %v\n", err)
+		log.Fatalf("Failed to load %s as YAML: %v\n", RCFilePath, err)
 	}
 	return &m
 }
