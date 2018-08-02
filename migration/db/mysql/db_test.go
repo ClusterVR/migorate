@@ -38,9 +38,9 @@ func TestDatabase(t *testing.T) {
 
 func createTestRc() {
 	buf, _ := ioutil.ReadFile("../../../test/rc/mysql.yml")
-	ioutil.WriteFile(".migoraterc", buf, os.ModePerm)
+	ioutil.WriteFile(RCFilePath, buf, os.ModePerm)
 }
 
 func removeTestRc() {
-	os.Remove(".migoraterc")
+	os.Remove(RCFilePath)
 }
