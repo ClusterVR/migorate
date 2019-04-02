@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 // RCFilePath configuration file path

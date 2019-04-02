@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/mizoguche/migorate/migration/db/mysql"
+	"github.com/ClusterVR/migorate/migration/db/mysql"
 )
 
 // Generate migration sql file

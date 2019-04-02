@@ -26,8 +26,9 @@ _testmain.go
 *.prof
 
 
-### Glide
+### mod
 vendor/
+go.sum
 
 ### For integration test
 db/migrations/

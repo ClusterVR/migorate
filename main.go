@@ -9,8 +9,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql" // Use mysql driver
 
-	"github.com/mizoguche/migorate/migration"
-	"github.com/mizoguche/migorate/migration/db/mysql"
+	"github.com/ClusterVR/migorate/migration"
+	"github.com/ClusterVR/migorate/migration/db/mysql"
 )
 
 func main() {
