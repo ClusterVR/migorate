@@ -9,8 +9,9 @@ import (
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/mizoguche/migorate/migration/db/mysql"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ClusterVR/migorate/migration/db/mysql"
 )
 
 const testMigrationPath = "../test/fixtures/success_migrations"

@@ -1,0 +1,53 @@
+version: 2.1
+
+commands:
+  go_mod_download:
+    steps:
+      - restore_cache:
+          name: Restore go modules cache
+          keys:
+            - mod-{{ .Environment.COMMON_CACHE_KEY }}-{{ checksum "go.mod" }}
+      - run: go mod download
+      - save_cache:
+          name: Save go modules cache
+          key: mod-{{ .Environment.COMMON_CACHE_KEY }}-{{ checksum "go.mod" }}
+          paths:
+            - /go/pkg/mod/cache
+
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.12
+        environment:
+          GO111MODULE: "on"
+      - image: circleci/mysql:5.7.17
+        environment:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_USER:          migorate
+          MYSQL_PASSWORD:      migorate
+          MYSQL_DATABASE:      migorate
+
+    working_directory: /go/src/github.com/ClusterVR/migorate
+    steps:
+      - checkout:
+          path: /go/src/github.com/ClusterVR/migorate
+      - run:
+          name: Waiting for MySQL to be ready
+          command: |
+            i=0
+            while true; do
+              if exec 3<> /dev/tcp/127.0.0.1/3306; then
+                exit 0
+              else
+                ((i++))
+                echo $i
+                [ $i -gt 30 ] && exit 1
+              fi
+              sleep 1
+            done
+          shell: /bin/bash
+      - run: go version
+      - go_mod_download
+      - run: ./circleci_env.sh
+      - run: go test -v -cover $(go list ./... | grep -v /vendor/)
+
