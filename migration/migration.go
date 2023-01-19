@@ -32,6 +32,9 @@ func NewMigration(dir string, id string) Migration {
 	b, _ := ioutil.ReadFile(dir + "/" + id + ".sql")
 	r := regexp.MustCompile(`(?m)-- \+migrate Up\n([\s\S]*)\n-- \+migrate Down\n([\s\S]*)`)
 	sqls := r.FindSubmatch(b)
+	if len(sqls) == 0 {
+		log.Fatalf("Invalid file format: %s\n", id)
+	}
 	up := splitSQL(string(sqls[1]))
 	down := splitSQL(string(sqls[2]))
 	return Migration{ID: id, Up: up, Down: down}
