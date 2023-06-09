@@ -28,7 +28,6 @@ _testmain.go
 
 ### mod
 vendor/
-go.sum
 
 ### For integration test
 db/migrations/
